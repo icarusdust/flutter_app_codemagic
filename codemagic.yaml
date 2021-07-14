@@ -40,10 +40,14 @@ workflows:
         script: |
           find . -name \*.aab -o -name \*.apk -print
         ignore_failure: true
+      - name: 
+      script: |
+          flutter build apk --release 
       # - name: Publishing with Fastlane
       #   script: |
       #     (pwd ; cd ios ; fastlane android upload_to_google_play)
     artifacts: 
+        - build/**/outputs/**/*.apk
         - build/**/outputs/**/*.aab
     publishing:
       email:
@@ -127,7 +131,7 @@ workflows:
           echo fastlane set_build_number
           cd ios && fastlane set_build_number ; cd ..
           echo "Starting flutter build ipa --flavor ${ENVIRONMENT_CHOICE}"
-          flutter build ipa --flavor ${ENVIRONMENT_CHOICE} --release --export-options-plist=ios/ExportOptions.plist
+          flutter build ipa  --release --export-options-plist=ios/ExportOptions.plist
           find . -name '*.ipa' -print
         ignore_failure: true
       - name: Create Screenshots
