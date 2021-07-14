@@ -1,0 +1,169 @@
+workflows:
+#
+#  Android Build
+#
+  test-android-development-workflow:
+    name: Android Development Workflow
+    # instance_type: linux #<--- this is a paid tier
+    max_build_duration: 40
+    environment:
+      vars:
+        ENVIRONMENT_CHOICE: "dev" # Choices: qa/dev
+      flutter: stable
+      xcode: latest
+      java: 1.8
+    cache:
+       cache_paths: 
+         - $FLUTTER_ROOT/.pub-cache
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: 'TMA-794*'
+          include: true
+          source: true
+      cancel_previous_builds: false
+    scripts:
+      - name: Test Flutter
+        script: |
+          echo "Testing Flutter"
+          #flutter test
+        ignore_failure: true
+      - name: Build Android
+        script: |
+          echo "Building for Android Target"
+          currentVersion=`grep "^version:*" $FCI_BUILD_DIR/pubspec.yaml | cut -d'+' -f 1 | cut -d' ' -f 2`
+          buildNumber=`grep "^version:*" $FCI_BUILD_DIR/pubspec.yaml | cut -d'+' -f 2`
+          echo flutter build appbundle --flavor ${ENVIRONMENT_CHOICE} --build-name=${currentVersion} --build-number=${buildNumber}
+          flutter build appbundle --flavor ${ENVIRONMENT_CHOICE} --build-name=${currentVersion} --build-number=${buildNumber}
+        ignore_failure: true
+      - name: Show Build Artifacts
+        script: |
+          find . -name \*.aab -o -name \*.apk -print
+        ignore_failure: true
+      - name: Publishing with Fastlane
+        script: |
+          (pwd ; cd ios ; fastlane android upload_to_google_play)
+    artifacts: 
+        - build/**/outputs/**/*.aab
+    publishing:
+      email:
+        recipients:
+          - rkhaleel@vnomicscorp.com
+        notify:
+          success: true
+#
+# iOS Build
+#            
+  test-ios-development-workflow:            
+    name: iOS Development Workflow
+    instance_type: mac_pro
+    max_build_duration: 40
+    environment:
+      vars:
+        ENVIRONMENT_CHOICE: "dev" # Choices: qa/dev
+        XCODE_WORKSPACE: "Runner.xcworkspace"
+        XCODE_SCHEME: "Runner"
+        FASTLANE_PASSWORD: Encrypted()
+        APP_STORE_CONNECT_ISSUER_ID: Encrypted() # <-- Put your encrypted App Store Connect Issuer Id here
+        APP_STORE_CONNECT_KEY_IDENTIFIER:  Encrypted( #<-- Put your encrypted App Store Connect Key Identifier here
+        APP_STORE_CONNECT_PRIVATE_KEY: Encrypted() # <-- Put your encrypted App Store Connect Private Key here
+        CERTIFICATE_PRIVATE_KEY: Encrypted() # <-- Put your encrypted Certificate Private Key here
+        APPLE_ID: Encrypted() # <-- Put your encrypted Apple Id email address here
+        APPLE_APP_SPECIFIC_PASSWORD: Encrypted() # <-- Put your encrypted App Specific password here
+        BUNDLE_ID: "com.vnomics.truefuel.f" # <-- Put your bundle id here
+        APP_STORE_ID: ..... # <-- Use the TestFlight Apple id number (An automatically generated ID assigned to your app) found under General > App Information > Apple ID.
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+      java: 1.8
+    cache:
+       cache_paths: 
+         - $FLUTTER_ROOT/.pub-cache
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: 'TMA-794*'
+          include: true
+          source: true
+      cancel_previous_builds: false
+    scripts:
+      - name: Test Flutter
+        script: |
+          echo "Testing Flutter"
+          #flutter test
+        ignore_failure: true
+      - name: Set up keychain to be used for codesigning using Codemagic CLI 'keychain' command
+        script: |
+                    keychain initialize
+      - name: Fetch signing files
+        script: |
+                    app-store-connect fetch-signing-files $BUNDLE_ID --type IOS_APP_STORE --create
+        ignore_failure: true
+      - name: Use system default keychain
+        script: |
+                    keychain add-certificates
+        ignore_failure: true
+      - name: Set up code signing settings on Xcode project
+        script: |
+                    xcode-project use-profiles
+        ignore_failure: true
+      - name: Get Flutter packages
+        script: |
+                    cd . && flutter packages pub get
+        ignore_failure: true
+      - name: Install pods
+        script: |
+          find . -name "Podfile" -execdir pod install \;
+        ignore_failure: true
+      - name: Build iOS
+        # working_directory: ios
+        script: |
+          echo "Building for iOS Target"
+          export buildNumber=`grep "^version:*" pubspec.yaml | cut -d'+' -f 2`
+          export releaseVersion=`grep "^version:*" pubspec.yaml | cut -d' ' -f 2 | cut -d'+' -f 1`
+          echo "releaseVersion is $releaseVersion"
+          echo fastlane set_build_number
+          cd ios && fastlane set_build_number ; cd ..
+          echo "Starting flutter build ipa --flavor ${ENVIRONMENT_CHOICE}"
+          flutter build ipa --flavor ${ENVIRONMENT_CHOICE} --release --export-options-plist=ios/ExportOptions.plist
+          find . -name '*.ipa' -print
+        ignore_failure: true
+      - name: Create Screenshots
+        # working_directory: .
+        script: |
+          #echo "Trying to install iOS 12.1 simulators"
+          #echo "" | xcversion simulators --install='iOS 12.1'
+          #echo "Creating screenshots devices list:"
+          #xcrun simctl list devices --json
+          #echo "xcrun simctl list"
+          #xcrun simctl list --json
+          echo "Running emulators:"
+          flutter emulator
+          #IPHONE_11_PRO_MAX_DEVICE_ID=3F9C2301-6AD8-409F-B275-29316C7CAC55 IPAD_PRO_11_3RD_DEVICE_ID=503ED4B8-9480-401C-99CC-F37B5E9DEDEE IPAD_AIR_4TH_DEVICE_ID=AF693EA2-3CEE-406E-9FD3-2AEF7C7AE4E0 IPAD_PRO_129_4TH_DEVICE_ID=6A5B12D9-73FA-44A3-8BF3-02A84090D174 IPHONE_8_PLUS_DEVICE_ID=EFC4BF4B-75E7-4319-A2E7-D95F84BF0475 ./screenshots.sh
+
+          IPHONE_11_PRO_MAX_DEVICE_ID=3F9C2301-6AD8-409F-B275-29316C7CAC55 IPAD_PRO_11_3RD_DEVICE_ID=503ED4B8-9480-401C-99CC-F37B5E9DEDEE IPAD_PRO_105_DEVICE_ID=AF693EA2-3CEE-406E-9FD3-2AEF7C7AE4E0 IPAD_PRO_129_4TH_DEVICE_ID=6A5B12D9-73FA-44A3-8BF3-02A84090D174 IPHONE_8_PLUS_DEVICE_ID=EFC4BF4B-75E7-4319-A2E7-D95F84BF0475 ./screenshots.sh
+          echo "Running emulators:"
+          flutter emulator
+        ignore_failure: true
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - build/ios/archive/*
+      - screenshots/*
+      - ios/fastlane/metadata/*
+      - /tmp/xcodebuild_logs/*.log
+      - flutter_drive.log
+    publishing:
+      app_store_connect: # For iOS or macOS app
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY     # Contents of the API key, can also reference environment variable such as $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER   # Alphanumeric value that identifies the API key, can also reference environment variable such as $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID     # Alphanumeric value that identifies who created the API key, can also reference environment variable such as $APP_STORE_CONNECT_ISSUER_ID
+        submit_to_testflight: true                  # Optional boolean, defaults to false. Whether or not to submit the uploaded build to TestFlight to automatically enroll your build to beta testers.
+      scripts:
+        - name: Upload screenshots
+          script: |
+                cd ios
+                APP_STORE_CONNECT_API_KEY_KEY_ID=$APP_STORE_CONNECT_KEY_IDENTIFIER APP_STORE_CONNECT_API_KEY_ISSUER_ID=$APP_STORE_CONNECT_ISSUER_ID APP_STORE_CONNECT_API_KEY_KEY=$APP_STORE_CONNECT_PRIVATE_KEY FASTLANE_PASSWORD=${FASTLANE_PASSWORD} APP_VERSION=${releaseVersion} builNumber=${buildNumber} fastlane upload_screenshots
+                FASTLANE_PASSWORD=${FASTLANE_PASSWORD} buildNumber=${buildNumber} APP_VERSION=${releaseVersion} fastlane upload_android_screenshots
+
