@@ -76,7 +76,6 @@ workflows:
         # APPLE_ID: Encrypted() # <-- Put your encrypted Apple Id email address here
         # APPLE_APP_SPECIFIC_PASSWORD: Encrypted() # <-- Put your encrypted App Specific password here
         BUNDLE_ID: "com.icaruscreens.app" # <-- Put your bundle id here
-        # APP_STORE_ID: ..... # <-- Use the TestFlight Apple id number (An automatically generated ID assigned to your app) found under General > App Information > Apple ID.
       flutter: stable
       xcode: latest
       cocoapods: default
