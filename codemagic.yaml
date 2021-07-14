@@ -2,60 +2,60 @@ workflows:
 #
 #  Android Build
 #
-  test-android-development-workflow:
-    name: Android Development Workflow
-    max_build_duration: 40
-    environment:
-      vars:
-        ENVIRONMENT_CHOICE: "dev" # Choices: qa/dev
-      flutter: stable
-      xcode: latest
-      java: 1.8
-    cache:
-       cache_paths: 
-         - $FLUTTER_ROOT/.pub-cache
-    triggering:
-      events:
-        - push
-      branch_patterns:
-        - pattern: 'TMA-794*'
-          include: true
-          source: true
-      cancel_previous_builds: false
-    scripts:
-      - name: Test Flutter
-        script: |
-          echo "Testing Flutter"
-          #flutter test
-        ignore_failure: true
-      - name: Build Android
-        script: |
-          echo "Building for Android Target"
-          currentVersion=`grep "^version:*" $FCI_BUILD_DIR/pubspec.yaml | cut -d'+' -f 1 | cut -d' ' -f 2`
-          buildNumber=`grep "^version:*" $FCI_BUILD_DIR/pubspec.yaml | cut -d'+' -f 2`
-          # echo flutter build appbundle --flavor ${ENVIRONMENT_CHOICE} --build-name=${currentVersion} --build-number=${buildNumber}
-          flutter build appbundle --build-name=${currentVersion} --build-number=${buildNumber}
-        ignore_failure: true
-      - name: Show Build Artifacts
-        script: |
-          find . -name \*.aab -o -name \*.apk -print
-        ignore_failure: true
-      - name: 
-        script: |
-          flutter build apk --release 
-      # - name: Publishing with Fastlane
-      #   script: |
-      #     (pwd ; cd ios ; fastlane android upload_to_google_play)
-    artifacts: 
-        - build/**/outputs/**/*.apk
-        - build/**/outputs/**/*.aab
-    publishing:
-      email:
-        recipients:
-          - nihal@nevercode.io
-        notify:
-          success: true
-          failure: false
+  # test-android-development-workflow:
+  #   name: Android Development Workflow
+  #   max_build_duration: 40
+  #   environment:
+  #     vars:
+  #       ENVIRONMENT_CHOICE: "dev" # Choices: qa/dev
+  #     flutter: stable
+  #     xcode: latest
+  #     java: 1.8
+  #   cache:
+  #      cache_paths: 
+  #        - $FLUTTER_ROOT/.pub-cache
+  #   triggering:
+  #     events:
+  #       - push
+  #     branch_patterns:
+  #       - pattern: 'TMA-794*'
+  #         include: true
+  #         source: true
+  #     cancel_previous_builds: false
+  #   scripts:
+  #     - name: Test Flutter
+  #       script: |
+  #         echo "Testing Flutter"
+  #         #flutter test
+  #       ignore_failure: true
+  #     - name: Build Android
+  #       script: |
+  #         echo "Building for Android Target"
+  #         currentVersion=`grep "^version:*" $FCI_BUILD_DIR/pubspec.yaml | cut -d'+' -f 1 | cut -d' ' -f 2`
+  #         buildNumber=`grep "^version:*" $FCI_BUILD_DIR/pubspec.yaml | cut -d'+' -f 2`
+  #         # echo flutter build appbundle --flavor ${ENVIRONMENT_CHOICE} --build-name=${currentVersion} --build-number=${buildNumber}
+  #         flutter build appbundle --build-name=${currentVersion} --build-number=${buildNumber}
+  #       ignore_failure: true
+  #     - name: Show Build Artifacts
+  #       script: |
+  #         find . -name \*.aab -o -name \*.apk -print
+  #       ignore_failure: true
+  #     - name: 
+  #       script: |
+  #         flutter build apk --release 
+  #     # - name: Publishing with Fastlane
+  #     #   script: |
+  #     #     (pwd ; cd ios ; fastlane android upload_to_google_play)
+  #   artifacts: 
+  #       - build/**/outputs/**/*.apk
+  #       - build/**/outputs/**/*.aab
+  #   publishing:
+  #     email:
+  #       recipients:
+  #         - nihal@nevercode.io
+  #       notify:
+  #         success: true
+  #         failure: false
 #
 # iOS Build
 #            
@@ -65,18 +65,18 @@ workflows:
     max_build_duration: 40
     environment:
       vars:
-        ENVIRONMENT_CHOICE: "dev" # Choices: qa/dev
-        XCODE_WORKSPACE: "Runner.xcworkspace"
-        XCODE_SCHEME: "Runner"
-        FASTLANE_PASSWORD: Encrypted()
-        APP_STORE_CONNECT_ISSUER_ID: Encrypted() # <-- Put your encrypted App Store Connect Issuer Id here
-        APP_STORE_CONNECT_KEY_IDENTIFIER:  Encrypted( #<-- Put your encrypted App Store Connect Key Identifier here
-        APP_STORE_CONNECT_PRIVATE_KEY: Encrypted() # <-- Put your encrypted App Store Connect Private Key here
-        CERTIFICATE_PRIVATE_KEY: Encrypted() # <-- Put your encrypted Certificate Private Key here
-        APPLE_ID: Encrypted() # <-- Put your encrypted Apple Id email address here
-        APPLE_APP_SPECIFIC_PASSWORD: Encrypted() # <-- Put your encrypted App Specific password here
-        BUNDLE_ID: "com.vnomics.truefuel.f" # <-- Put your bundle id here
-        APP_STORE_ID: ..... # <-- Use the TestFlight Apple id number (An automatically generated ID assigned to your app) found under General > App Information > Apple ID.
+        #ENVIRONMENT_CHOICE: "dev" # Choices: qa/dev
+        # XCODE_WORKSPACE: "Runner.xcworkspace"
+        # XCODE_SCHEME: "Runner"
+        # FASTLANE_PASSWORD: Encrypted()
+        # APP_STORE_CONNECT_ISSUER_ID: Encrypted() # <-- Put your encrypted App Store Connect Issuer Id here
+        # APP_STORE_CONNECT_KEY_IDENTIFIER:  Encrypted( #<-- Put your encrypted App Store Connect Key Identifier here
+        # APP_STORE_CONNECT_PRIVATE_KEY: Encrypted() # <-- Put your encrypted App Store Connect Private Key here
+        # CERTIFICATE_PRIVATE_KEY: Encrypted() # <-- Put your encrypted Certificate Private Key here
+        # APPLE_ID: Encrypted() # <-- Put your encrypted Apple Id email address here
+        # APPLE_APP_SPECIFIC_PASSWORD: Encrypted() # <-- Put your encrypted App Specific password here
+        # BUNDLE_ID: "com.vnomics.truefuel.f" # <-- Put your bundle id here
+        # APP_STORE_ID: ..... # <-- Use the TestFlight Apple id number (An automatically generated ID assigned to your app) found under General > App Information > Apple ID.
       flutter: stable
       xcode: latest
       cocoapods: default
@@ -130,7 +130,7 @@ workflows:
           echo "releaseVersion is $releaseVersion"
           echo fastlane set_build_number
           cd ios && fastlane set_build_number ; cd ..
-          echo "Starting flutter build ipa --flavor ${ENVIRONMENT_CHOICE}"
+          echo "Starting flutter build ipa "
           flutter build ipa  --release --export-options-plist=ios/ExportOptions.plist
           find . -name '*.ipa' -print
         ignore_failure: true
