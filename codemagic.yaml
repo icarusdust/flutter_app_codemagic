@@ -104,10 +104,10 @@ workflows:
         script: |
                     app-store-connect fetch-signing-files $BUNDLE_ID --type IOS_APP_STORE --create
         ignore_failure: true
-      - name: Use system default keychain
-        script: |
-                    keychain add-certificates
-        ignore_failure: true
+      # - name: Use system default keychain
+      #   script: |
+      #               keychain add-certificates
+      #   ignore_failure: true
       - name: Set up code signing settings on Xcode project
         script: |
                     xcode-project use-profiles
