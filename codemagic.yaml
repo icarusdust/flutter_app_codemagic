@@ -34,16 +34,16 @@ workflows:
           echo "Building for Android Target"
           currentVersion=`grep "^version:*" $FCI_BUILD_DIR/pubspec.yaml | cut -d'+' -f 1 | cut -d' ' -f 2`
           buildNumber=`grep "^version:*" $FCI_BUILD_DIR/pubspec.yaml | cut -d'+' -f 2`
-          echo flutter build appbundle --flavor ${ENVIRONMENT_CHOICE} --build-name=${currentVersion} --build-number=${buildNumber}
+          # echo flutter build appbundle --flavor ${ENVIRONMENT_CHOICE} --build-name=${currentVersion} --build-number=${buildNumber}
           flutter build appbundle --flavor ${ENVIRONMENT_CHOICE} --build-name=${currentVersion} --build-number=${buildNumber}
         ignore_failure: true
       - name: Show Build Artifacts
         script: |
           find . -name \*.aab -o -name \*.apk -print
         ignore_failure: true
-      - name: Publishing with Fastlane
-        script: |
-          (pwd ; cd ios ; fastlane android upload_to_google_play)
+      # - name: Publishing with Fastlane
+      #   script: |
+      #     (pwd ; cd ios ; fastlane android upload_to_google_play)
     artifacts: 
         - build/**/outputs/**/*.aab
     publishing:
@@ -52,6 +52,7 @@ workflows:
           - nihal@nevercode.io
         notify:
           success: true
+          failure: false
 #
 # iOS Build
 #            
