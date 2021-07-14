@@ -49,7 +49,7 @@ workflows:
     publishing:
       email:
         recipients:
-          - rkhaleel@vnomicscorp.com
+          - nihal@nevercode.io
         notify:
           success: true
 #
@@ -154,16 +154,16 @@ workflows:
       - ios/fastlane/metadata/*
       - /tmp/xcodebuild_logs/*.log
       - flutter_drive.log
-    publishing:
-      app_store_connect: # For iOS or macOS app
-        api_key: $APP_STORE_CONNECT_PRIVATE_KEY     # Contents of the API key, can also reference environment variable such as $APP_STORE_CONNECT_PRIVATE_KEY
-        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER   # Alphanumeric value that identifies the API key, can also reference environment variable such as $APP_STORE_CONNECT_KEY_IDENTIFIER
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID     # Alphanumeric value that identifies who created the API key, can also reference environment variable such as $APP_STORE_CONNECT_ISSUER_ID
-        submit_to_testflight: true                  # Optional boolean, defaults to false. Whether or not to submit the uploaded build to TestFlight to automatically enroll your build to beta testers.
-      scripts:
-        - name: Upload screenshots
-          script: |
-                cd ios
-                APP_STORE_CONNECT_API_KEY_KEY_ID=$APP_STORE_CONNECT_KEY_IDENTIFIER APP_STORE_CONNECT_API_KEY_ISSUER_ID=$APP_STORE_CONNECT_ISSUER_ID APP_STORE_CONNECT_API_KEY_KEY=$APP_STORE_CONNECT_PRIVATE_KEY FASTLANE_PASSWORD=${FASTLANE_PASSWORD} APP_VERSION=${releaseVersion} builNumber=${buildNumber} fastlane upload_screenshots
-                FASTLANE_PASSWORD=${FASTLANE_PASSWORD} buildNumber=${buildNumber} APP_VERSION=${releaseVersion} fastlane upload_android_screenshots
+    # publishing:
+    #   app_store_connect: # For iOS or macOS app
+    #     api_key: $APP_STORE_CONNECT_PRIVATE_KEY     # Contents of the API key, can also reference environment variable such as $APP_STORE_CONNECT_PRIVATE_KEY
+    #     key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER   # Alphanumeric value that identifies the API key, can also reference environment variable such as $APP_STORE_CONNECT_KEY_IDENTIFIER
+    #     issuer_id: $APP_STORE_CONNECT_ISSUER_ID     # Alphanumeric value that identifies who created the API key, can also reference environment variable such as $APP_STORE_CONNECT_ISSUER_ID
+    #     submit_to_testflight: true                  # Optional boolean, defaults to false. Whether or not to submit the uploaded build to TestFlight to automatically enroll your build to beta testers.
+    #   scripts:
+    #     - name: Upload screenshots
+    #       script: |
+    #             cd ios
+    #             APP_STORE_CONNECT_API_KEY_KEY_ID=$APP_STORE_CONNECT_KEY_IDENTIFIER APP_STORE_CONNECT_API_KEY_ISSUER_ID=$APP_STORE_CONNECT_ISSUER_ID APP_STORE_CONNECT_API_KEY_KEY=$APP_STORE_CONNECT_PRIVATE_KEY FASTLANE_PASSWORD=${FASTLANE_PASSWORD} APP_VERSION=${releaseVersion} builNumber=${buildNumber} fastlane upload_screenshots
+    #             FASTLANE_PASSWORD=${FASTLANE_PASSWORD} buildNumber=${buildNumber} APP_VERSION=${releaseVersion} fastlane upload_android_screenshots
 
