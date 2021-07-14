@@ -41,7 +41,7 @@ workflows:
           find . -name \*.aab -o -name \*.apk -print
         ignore_failure: true
       - name: 
-      script: |
+        script: |
           flutter build apk --release 
       # - name: Publishing with Fastlane
       #   script: |
