@@ -35,7 +35,7 @@ workflows:
           currentVersion=`grep "^version:*" $FCI_BUILD_DIR/pubspec.yaml | cut -d'+' -f 1 | cut -d' ' -f 2`
           buildNumber=`grep "^version:*" $FCI_BUILD_DIR/pubspec.yaml | cut -d'+' -f 2`
           # echo flutter build appbundle --flavor ${ENVIRONMENT_CHOICE} --build-name=${currentVersion} --build-number=${buildNumber}
-          flutter build appbundle --flavor ${ENVIRONMENT_CHOICE} --build-name=${currentVersion} --build-number=${buildNumber}
+          flutter build appbundle ${ENVIRONMENT_CHOICE} --build-name=${currentVersion} --build-number=${buildNumber}
         ignore_failure: true
       - name: Show Build Artifacts
         script: |
